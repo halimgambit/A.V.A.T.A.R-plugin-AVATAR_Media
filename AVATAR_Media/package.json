@@ -1,0 +1,12 @@
+{
+    "name": "AVATAR_Media",
+    "version": "1.0.0",
+    "type": "module",
+    "description": "Plugin AVATAR_Media for A.V.A.T.A.R",
+    "repository": "https://github.com/YOUR-REPOSITORY",
+    "keywords": [
+        "AVATAR_Media"
+    ],
+    "author": "YOUR-NAME",
+    "license": "mit"
+  }
