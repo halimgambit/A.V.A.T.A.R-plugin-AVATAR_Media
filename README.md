@@ -15,13 +15,16 @@ Lecteur multimédia graphique intégré à A.V.A.T.A.R (Electron).
 
 This plugin is an add-on for the [A.V.A.T.A.R](https://avatar-home-automation.github.io/docs) framework.
 
-## 🎯 Usage – Commandes vocales
+## ✨ Fonctionnalités
 
-- **Radio Internet** : écoute des radios avec reconnaissance du nom et AskMe.
-- **Télévision / IPTV** : lecture des chaînes TV configurées dans un fichier JSON (TF1, etc.).
-- **Films / Séries / Vidéos** : lecture des fichiers locaux depuis vos répertoires.
-- **Musique** : lecture de fichiers audio locaux.
-- **Playlists** : organisation de la musique par dossiers (Pop, Rock, Jazz, Reggae, Groove, etc.).
+- 📻 **Radio Internet** : écoute de flux radio web avec reconnaissance du nom de la station et sélection interactive via `AskMe`.
+- 📺 **Télévision / IPTV** : lecture des chaînes TV en direct (flux HLS / `.m3u8`) définies dans un fichier externe `channels.json`.
+- 🎬 **Films / Séries / Vidéos** : recherche récursive et lecture de fichiers vidéo locaux depuis votre répertoire configuré.
+- 🎵 **Musique** : lecture de fichiers audio locaux par titre, artiste, album ou en mode mix aléatoire.
+- 📂 **Playlists** : lecture de playlists organisées par sous-dossiers thématiques (Pop, Rock, Jazz, Reggae, Groove, etc.) ou via fichiers `.m3u` / `.m3u8`.
+- 📖 **Histoires / Contes** : lecture d'histoires audio configurées avec reconnaissance du titre ou tirage aléatoire sans répétition.
+- 🏠 **Multi-room** : pilotage et déport d'affichage vers n'importe quel client connecté (Salon, Chambre, Cuisine, etc.).
+- 🌍 **Multi-langue** : repose entièrement sur le système de packs de langues d'A.V.A.T.A.R.
 
 ## 🏠 Multi-room
 
