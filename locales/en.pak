@@ -1,0 +1,7 @@
+{
+    "speech": {
+    "laugh": "$$",
+    "noKey": "The jokes API key is not configured.",
+    "errorAccess": "I can't access the jokes right now."
+  }
+}

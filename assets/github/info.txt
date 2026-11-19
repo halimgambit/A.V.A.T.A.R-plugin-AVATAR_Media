@@ -1,0 +1,3 @@
+AVATAR_Media
+
+Lecteur multimédia graphique intégré à A.V.A.T.A.R (Electron), permettant de centraliser la lecture des radios Internet, chaînes TV / IPTV, films, séries, vidéos et musiques avec gestion des playlists. Compatible avec une utilisation multiroom pour diffuser les médias sur les différents clients A.V.A.T.A.R.

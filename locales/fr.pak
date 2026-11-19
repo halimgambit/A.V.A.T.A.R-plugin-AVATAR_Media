@@ -1,0 +1,22 @@
+{
+  "speech": {
+    "playRadio": "Je lance la radio $$|Voici $$|C'est parti pour $$",
+    "playTv": "Je mets $$|Je lance la chaîne $$|Voici $$ en direct",
+    "stop": "J'arrête la lecture|Lecteur fermé|C'est coupé",
+    "whichRadio": "Quelle radio souhaites-tu écouter ?|Dis-moi le nom de la station que tu veux mettre",
+    "unknowChannel": "Je ne connais pas cette chaîne de télévision|Désolé, cette chaîne n'est pas dans ma liste",
+    "cancel": "D'accord, j'annule|Très bien, on laisse tomber",
+    "Timeout": "Je n'ai pas entendu de réponse, j'annule|Temps écoulé, demande annulée",
+    "autoStop": "Arrêt automatique de la radio dans la piéce $$",
+    "playMovie": "Je lance le film $$|Bon film avec $$|Voici $$",
+    "noVideosFound": "Aucun fichier vidéo n'a été trouvé dans ton dossier",
+    "unknownMovie": "Je n'ai pas trouvé ce film ou cette série dans ta bibliothèque",
+    "errorApi": "Une erreur est survenue lors de la lecture du média",
+    "playMusic": "Je lance $$|C'est parti pour $$|Lecture de $$",
+    "noMusicFound": "Aucun fichier audio n'a été trouvé dans ton dossier musique",
+    "unknownMusic": "Je n'ai pas trouvé cette musique ou cet artiste dans ta bibliothèque",
+    "playPlaylist": "Playliste $$|C'est parti pour $$|Lecture de $$",
+    "noPlaylistFound": "Aucun fichier playlist n'a été trouvé dans ton dossier plylist",
+    "unknownPlaylist": "Je n'ai pas trouvé cette playlist dans ta bibliothèque"
+  }
+}

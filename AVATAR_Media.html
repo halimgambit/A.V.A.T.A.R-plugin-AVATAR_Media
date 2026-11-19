@@ -1,0 +1,256 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>AVATAR MediaPlayer</title>
+    <script src="./hls.min.js"></script>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: #1e1e2e;
+            color: #cdd6f4;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #header {
+            padding: 12px 20px;
+            background: #11111b;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid #313244;
+            height: 60px;
+        }
+
+        #logo {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
+        #title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        #player-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+            position: relative;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
+            outline: none;
+        }
+
+        .audio-visual {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .audio-visual img {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            object-fit: cover;
+        }
+
+        audio {
+            width: 350px;
+            height: 50px;
+            outline: none;
+        }
+
+        .visualizer {
+            height: 65px;
+            margin: 15px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .bar {
+            width: 7px;
+            height: 20px;
+            border-radius: 5px;
+            background: #89b4fa;
+            animation: wave .8s infinite ease-in-out;
+        }
+
+        .bar:nth-child(2) { animation-delay: .1s; }
+        .bar:nth-child(3) { animation-delay: .2s; }
+        .bar:nth-child(4) { animation-delay: .3s; }
+        .bar:nth-child(5) { animation-delay: .4s; }
+        .bar:nth-child(6) { animation-delay: .3s; }
+        .bar:nth-child(7) { animation-delay: .2s; }
+        .bar:nth-child(8) { animation-delay: .1s; }
+
+        @keyframes wave {
+            50% { height: 55px; }
+        }
+
+        .visualizer.paused .bar {
+            animation-play-state: paused;
+            height: 12px;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="header">
+        <img id="logo" src="" alt="" style="display:none;">
+        <div id="title">AVATAR MediaPlayer</div>
+    </div>
+    <div id="player-container">
+        <div style="color: #6c7086; font-size: 1.2rem;">
+            En attente d'un média...
+        </div>
+    </div>
+    <script>
+        let currentHls = null;
+        window.playMedia = function(mediaInfo) {
+            const titleEl = document.getElementById('title');
+            const logoEl = document.getElementById('logo');
+            const container = document.getElementById('player-container');
+            if (currentHls) {
+                currentHls.destroy();
+                currentHls = null;
+            }
+            titleEl.textContent = mediaInfo.name
+                ? mediaInfo.name.toUpperCase()
+                : "MÉDIA";
+            if (mediaInfo.logo) {
+                logoEl.src = mediaInfo.logo;
+                logoEl.style.display = 'block';
+            } else {
+                logoEl.style.display = 'none';
+            }
+            if (
+                mediaInfo.type === 'radio' ||
+                mediaInfo.type === 'music' ||
+                mediaInfo.type === 'playlist'
+            ) {
+                const playlist = mediaInfo.playlist || [
+                    { title: mediaInfo.name, url: mediaInfo.url }
+                ];
+                let currentIndex = 0;
+                container.innerHTML = ` <div class="audio-visual">
+                        ${mediaInfo.logo
+                            ? `<img src="${mediaInfo.logo}" alt="Logo">`
+                            : '<div style="font-size:64px;">🎵</div>'
+                        }
+                        <div id="track-title"
+                             style="font-size:1.2rem;font-weight:bold;text-align:center;">
+                            ${playlist[0].title}
+                        </div>
+                        <!-- VISUALIZER - AJOUT -->
+                        <div class="visualizer paused" id="visualizer">
+                            <span class="bar"></span>
+                            <span class="bar"></span>
+                            <span class="bar"></span>
+                            <span class="bar"></span>
+                            <span class="bar"></span>
+                            <span class="bar"></span>
+                            <span class="bar"></span>
+                            <span class="bar"></span>
+                        </div>
+                        <!-- FIN VISUALIZER -->
+                        <audio id="audioPlayer" autoplay
+                               src="${playlist[0].url}"></audio>
+                        ${playlist.length > 1 ? `
+                            <div style="display:flex;gap:15px;margin-top:10px;">
+                                <button id="btn-prev"
+                                    style="padding:8px 16px;border-radius:6px;border:none;background:#313244;color:#cdd6f4;cursor:pointer;">
+                                    ⏮ Précédent
+                                </button>
+                                <span id="track-count"
+                                    style="align-self:center;color:#a6adc8;">
+                                    1 / ${playlist.length}
+                                </span>
+                                <button id="btn-next"
+                                    style="padding:8px 16px;border-radius:6px;border:none;background:#313244;color:#cdd6f4;cursor:pointer;">
+                                    Suivant ⏭
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+
+                const audio = document.getElementById('audioPlayer');
+                const visualizer = document.getElementById('visualizer');
+                audio.addEventListener('play', () => {
+                    visualizer.classList.remove('paused');
+                });
+                audio.addEventListener('pause', () => {
+                    visualizer.classList.add('paused');
+                });
+                audio.addEventListener('ended', () => {
+                    visualizer.classList.add('paused');
+                });
+                audio.addEventListener('error', () => {
+                    visualizer.classList.add('paused');
+                });
+                if (playlist.length > 1) {
+                    const trackTitle = document.getElementById('track-title');
+                    const trackCount = document.getElementById('track-count');
+                    const loadTrack = (index) => {
+                        currentIndex = (index + playlist.length) % playlist.length;
+                        audio.src = playlist[currentIndex].url;
+                        trackTitle.textContent = playlist[currentIndex].title;
+                        trackCount.textContent =
+                            `${currentIndex + 1} / ${playlist.length}`;
+                        audio.play().catch(e => console.error(e));
+                    };
+                    audio.addEventListener('ended', () => loadTrack(currentIndex + 1));
+                    document.getElementById('btn-prev').addEventListener('click', () =>
+                        loadTrack(currentIndex - 1)
+                    );
+                    document.getElementById('btn-next').addEventListener('click', () =>
+                        loadTrack(currentIndex + 1)
+                    );
+                }
+                return;
+            }
+            container.innerHTML = `<video id="videoPlayer" controls autoplay playsinline></video>`;
+            const video = document.getElementById('videoPlayer');
+            const isHls = mediaInfo.url &&
+                mediaInfo.url.toLowerCase().includes('.m3u8');
+            if (isHls && typeof Hls !== 'undefined' && Hls.isSupported()) {
+                currentHls = new Hls();
+                currentHls.loadSource(mediaInfo.url);
+                currentHls.attachMedia(video);
+            } else {
+                video.src = mediaInfo.url;
+                video.play().catch(err =>
+                    console.error("Erreur de lecture vidéo :", err)
+                );
+            }
+        };
+    </script>
+</body>
+</html>
+
+
