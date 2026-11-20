@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -115,7 +114,6 @@
             animation-play-state: paused;
             height: 12px;
         }
-
     </style>
 </head>
 
@@ -129,44 +127,59 @@
             En attente d'un média...
         </div>
     </div>
+
     <script>
         let currentHls = null;
+
+        const getFallbackIcon = (type) => {
+            if (type === 'story') return '📖';
+            if (type === 'radio') return '📻';
+            return '🎵';
+        };
+
         window.playMedia = function(mediaInfo) {
             const titleEl = document.getElementById('title');
             const logoEl = document.getElementById('logo');
             const container = document.getElementById('player-container');
+
             if (currentHls) {
                 currentHls.destroy();
                 currentHls = null;
             }
+
             titleEl.textContent = mediaInfo.name
                 ? mediaInfo.name.toUpperCase()
                 : "MÉDIA";
+
             if (mediaInfo.logo) {
                 logoEl.src = mediaInfo.logo;
                 logoEl.style.display = 'block';
             } else {
                 logoEl.style.display = 'none';
             }
+
             if (
                 mediaInfo.type === 'radio' ||
                 mediaInfo.type === 'music' ||
-                mediaInfo.type === 'playlist'
+                mediaInfo.type === 'playlist' ||
+                mediaInfo.type === 'story'
             ) {
                 const playlist = mediaInfo.playlist || [
                     { title: mediaInfo.name, url: mediaInfo.url }
                 ];
                 let currentIndex = 0;
-                container.innerHTML = ` <div class="audio-visual">
+                const fallbackIcon = getFallbackIcon(mediaInfo.type);
+
+                container.innerHTML = `
+                    <div class="audio-visual">
                         ${mediaInfo.logo
                             ? `<img src="${mediaInfo.logo}" alt="Logo">`
-                            : '<div style="font-size:64px;">🎵</div>'
+                            : `<div style="font-size:64px;">${fallbackIcon}</div>`
                         }
                         <div id="track-title"
                              style="font-size:1.2rem;font-weight:bold;text-align:center;">
                             ${playlist[0].title}
                         </div>
-                        <!-- VISUALIZER - AJOUT -->
                         <div class="visualizer paused" id="visualizer">
                             <span class="bar"></span>
                             <span class="bar"></span>
@@ -177,10 +190,9 @@
                             <span class="bar"></span>
                             <span class="bar"></span>
                         </div>
-                        <!-- FIN VISUALIZER -->
                         <audio id="audioPlayer" autoplay
                                src="${playlist[0].url}"></audio>
-                        ${playlist.length > 1 ? `
+                        ${playlist.length > 1 && mediaInfo.type !== 'story' ? `
                             <div style="display:flex;gap:15px;margin-top:10px;">
                                 <button id="btn-prev"
                                     style="padding:8px 16px;border-radius:6px;border:none;background:#313244;color:#cdd6f4;cursor:pointer;">
@@ -201,29 +213,40 @@
 
                 const audio = document.getElementById('audioPlayer');
                 const visualizer = document.getElementById('visualizer');
+
                 audio.addEventListener('play', () => {
                     visualizer.classList.remove('paused');
                 });
+
                 audio.addEventListener('pause', () => {
                     visualizer.classList.add('paused');
                 });
+
                 audio.addEventListener('ended', () => {
                     visualizer.classList.add('paused');
+                    if (mediaInfo.type === 'story') {
+                        console.log("Histoire terminée : fermeture du MediaPlayer");
+                        setTimeout(() => {
+                            window.close();
+                        }, 1000);
+                    }
                 });
+
                 audio.addEventListener('error', () => {
                     visualizer.classList.add('paused');
                 });
-                if (playlist.length > 1) {
+
+                if (playlist.length > 1 && mediaInfo.type !== 'story') {
                     const trackTitle = document.getElementById('track-title');
                     const trackCount = document.getElementById('track-count');
                     const loadTrack = (index) => {
                         currentIndex = (index + playlist.length) % playlist.length;
                         audio.src = playlist[currentIndex].url;
                         trackTitle.textContent = playlist[currentIndex].title;
-                        trackCount.textContent =
-                            `${currentIndex + 1} / ${playlist.length}`;
+                        trackCount.textContent = `${currentIndex + 1} / ${playlist.length}`;
                         audio.play().catch(e => console.error(e));
                     };
+
                     audio.addEventListener('ended', () => loadTrack(currentIndex + 1));
                     document.getElementById('btn-prev').addEventListener('click', () =>
                         loadTrack(currentIndex - 1)
@@ -234,10 +257,12 @@
                 }
                 return;
             }
+
             container.innerHTML = `<video id="videoPlayer" controls autoplay playsinline></video>`;
             const video = document.getElementById('videoPlayer');
             const isHls = mediaInfo.url &&
                 mediaInfo.url.toLowerCase().includes('.m3u8');
+
             if (isHls && typeof Hls !== 'undefined' && Hls.isSupported()) {
                 currentHls = new Hls();
                 currentHls.loadSource(mediaInfo.url);
@@ -252,5 +277,3 @@
     </script>
 </body>
 </html>
-
-

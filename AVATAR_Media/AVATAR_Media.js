@@ -6,6 +6,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename)
 
 let mediaWindow = null;
+let lastStory = null;
 
 const resolvePath = (p) => p.replace(/%([^%]+)%/g, (_, env) => process.env[env] || '');
 
@@ -32,6 +33,7 @@ export async function action(data, callback) {
             playMovie: () => playMovie(data, client, toClient, Locale),
             playMusic: () => playMusic(data, client, toClient, Locale),
             playPlaylist: () => playPlaylist(data, client, toClient, Locale),
+            playStory: () => playStory(data, client, toClient, Locale),
             stopMedia: () => stopMedia(client, toClient, Locale)
         };
 
@@ -124,8 +126,8 @@ const listenRadio = async (data, client, toClient, Locale) => {
     info(Locale.get(["speech.playRadio", key]));
     if (typeof Avatar.clientPlugin === "function" && toClient) {
         Avatar.clientPlugin(toClient, "AVATAR_Media", {
-            ...data,
-            client: toClient,
+            action: { command: "listenRadio" },
+            client: client,
             toClient: toClient,
             mediaData: mediaInfo
         }, () => {});
@@ -214,8 +216,8 @@ const watchTv = async (data, client, toClient, Locale) => {
         info(Locale.get(["speech.playTv", key]));
     if (typeof Avatar.clientPlugin === "function" && toClient) {
         Avatar.clientPlugin(toClient, "AVATAR_Media", {
-            ...data,
-            client: toClient,
+            action: { command: "watchTv" },
+            client: client,
             toClient: toClient,
             mediaData: mediaInfo
         }, () => {});
@@ -370,8 +372,8 @@ const playMovie = async (data, client, toClient, Locale) => {
             info(Locale.get(["speech.playMovie", foundMovie.title]));
              if (typeof Avatar.clientPlugin === "function" && toClient) {
                 Avatar.clientPlugin(toClient, "AVATAR_Media", {
-                    ...data,
-                    client: toClient,
+                    action: { command: "playMovie" },
+                    client: client,
                     toClient: toClient,
                     mediaData: mediaInfo
                 }, () => {});
@@ -526,10 +528,9 @@ const playMusic = async (data, client, toClient, Locale) => {
                  info(Locale.get(["speech.playMusic", displayTitle]));
              if (typeof Avatar.clientPlugin === "function" && toClient) {
                 Avatar.clientPlugin(toClient, "AVATAR_Media", {
-                    ...data,
-                    client: toClient,
-                    toClient: toClient,
                     action: { command: "playMusic" },
+                    client: client,
+                    toClient: toClient,
                     mediaData: mediaInfo
                 }, () => {});
             } else {
@@ -639,10 +640,9 @@ const playPlaylist = async (data, client, toClient, Locale) => {
             Avatar.speak(speechMsg, client, async () => {
             if (typeof Avatar.clientPlugin === "function" && toClient) {
                 Avatar.clientPlugin(toClient, "AVATAR_Media", {
-                    ...data,
-                    client: toClient,
+                   action: { command: "playPlaylist" },
+                    client: client,
                     toClient: toClient,
-                    action: { command: "playPlaylist" },
                     mediaData: mediaInfo
                 }, () => {});
             } else {
@@ -660,13 +660,75 @@ const playPlaylist = async (data, client, toClient, Locale) => {
 };
 
 
+const playStory = async (data, client, toClient, Locale) => {
+    try {
+        if (data.mediaData) {
+            await openMediaWindow(data.mediaData);
+            return;
+        }
+
+        const sentence = normalizeStr(data.rawSentence || data.sentence || data.action?.sentence || "");
+
+        const stories = Config.modules.AVATAR_Media.stories || {};
+        const keys = Object.keys(stories);
+
+        if (!keys.length) {
+            return Avatar.speak(Locale.get("speech.noStory"), client, () => Avatar.Speech.end(client))
+        }
+
+        // Recherche de l'histoire demandée
+        const sortedKeys = [...keys].sort((a, b) => b.length - a.length);
+
+        let foundStory = sortedKeys.find(key =>
+            sentence.includes(normalizeStr(key))
+        );
+
+        // Si aucune histoire n'est demandée, choix aléatoire
+        if (!foundStory) {
+            const available = keys.filter(key => key !== lastStory);
+            const pool = available.length ? available : keys;
+
+            foundStory = pool[Math.floor(Math.random() * pool.length)];
+        }
+
+        lastStory = foundStory;
+
+        const mediaInfo = {
+            type: "story",
+            name: foundStory,
+            url: stories[foundStory],
+            logo: ""
+        };
+
+        Avatar.speak(Locale.get(["speech.tellStory", foundStory]), client, async () => {
+            info(`Histoire : lecture de [${foundStory}] sur ${toClient}`);
+            if (typeof Avatar.clientPlugin === "function" && toClient) {
+                Avatar.clientPlugin(toClient, "AVATAR_Media", {
+                    action: { command: "playStory" },
+                    client: client,
+                    toClient: toClient,
+                    mediaData: mediaInfo
+                }, () => {});
+            } else {
+                await openMediaWindow(mediaInfo);
+            }
+
+            Avatar.Speech.end(client);
+        });
+
+    } catch (err) {
+        error("Erreur Histoire:", err.message);
+        Avatar.speak(Locale.get("speech.errorApi"), client, () => Avatar.Speech.end(client));
+    }
+};
+
 
 const stopMedia = async (client, toClient, Locale) => {
     if (typeof Avatar.clientPlugin === "function" && toClient) {
         Avatar.clientPlugin(toClient, "AVATAR_Media", {
+            action: { command: "stopMedia" },
             client: toClient,
-            toClient: toClient,
-            action: { command: "stopMedia" }
+            toClient: toClient
         }, () => {});
 
         Avatar.speak(Locale.get("speech.stop"), client, () => {

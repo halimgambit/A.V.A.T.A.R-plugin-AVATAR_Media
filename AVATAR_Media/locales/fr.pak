@@ -2,7 +2,6 @@
   "speech": {
     "playRadio": "Je lance la radio $$|Voici $$|C'est parti pour $$",
     "playTv": "Je mets $$|Je lance la chaîne $$|Voici $$ en direct",
-    "stop": "J'arrête la lecture|Lecteur fermé|C'est coupé",
     "whichRadio": "Quelle radio souhaites-tu écouter ?|Dis-moi le nom de la station que tu veux mettre",
     "unknowChannel": "Je ne connais pas cette chaîne de télévision|Désolé, cette chaîne n'est pas dans ma liste",
     "cancel": "D'accord, j'annule|Très bien, on laisse tomber",
@@ -17,6 +16,9 @@
     "unknownMusic": "Je n'ai pas trouvé cette musique ou cet artiste dans ta bibliothèque",
     "playPlaylist": "Playliste $$|C'est parti pour $$|Lecture de $$",
     "noPlaylistFound": "Aucun fichier playlist n'a été trouvé dans ton dossier plylist",
-    "unknownPlaylist": "Je n'ai pas trouvé cette playlist dans ta bibliothèque"
+    "unknownPlaylist": "Je n'ai pas trouvé cette playlist dans ta bibliothèque",
+    "tellStory": "Je lance l'histoire $$|Voici $$|C'est parti pour $$",
+    "noStory": "Je ne connais pas cette histoire|Désolé, cette histoire n'est pas dans ma liste",
+    "stop": "J'arrête la lecture|Lecteur fermé|C'est coupé"
   }
 }
